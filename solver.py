@@ -32,20 +32,22 @@ def simulatedAnnealing(initialTreshold, G):
     def nodeRemover(threshold, nodesRemoved):
         if nodesRemoved >= MAX_NODES_REMOVED or threshold >= 1:
             return
-        largestYet, diff = None, 0 
         allnodes = nx.dijkstra_path(G, 0, endNode)
         improvementScore = []
         noPossibleUpdates = True
         for i in allnodes:
+            if i == 0 or i == endNode:
+                improvementScore.append(0)
+                continue
             score = node_diff(G, i, endNode)
             if score:
                 noPossibleUpdates = False
-                improvementScore.append(score if score else 0)
+            improvementScore.append(score if score else 0)
         if noPossibleUpdates:
             return 
         chosenNode = random.choices(allnodes, weights=improvementScore, k = 1)
         deletedNodes.append(chosenNode[0])
-        G.remove_node(chosenNode[0][0],chosenNode[0][1])
+        G.remove_node(chosenNode[0])
         return nodeRemover(threshold + 0.001, nodesRemoved + 1)
     
     def edgeRemover(threshold, edgesRemoved):
@@ -119,7 +121,7 @@ if __name__ == '__main__':
             existingSol = read_output_file(G, output_path)
             if largest > existingSol:
                 write_output_file(G, resultc, resultk, output_path)
-                print("enhanced by: " + str(largest - existingSol))
+                print("enhanced by: " + str((largest - existingSol)/existingSol))
             print(str(count) + " out of " +str(len(inputs)) + " Done.")
             count += 1
         
