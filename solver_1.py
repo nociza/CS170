@@ -33,7 +33,7 @@ def solve(G):
         shortest_path = nx.dijkstra_path(new_G, 0, num_nodes - 1)
         node_weights = []
         for i in range(1, len(shortest_path) - 1):
-            node_weights.append(new_G[shortest_path[i-1]][shortest_path[i]]["weight"] + new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + new_G.degree[shortest_path[i]])
+            node_weights.append(new_G[shortest_path[i-1]][shortest_path[i]]["weight"] + new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 2 * new_G.degree[shortest_path[i]])
 
         removed = False
         if len(node_weights) == 0:
