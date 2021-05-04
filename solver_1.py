@@ -85,7 +85,7 @@ def solve(G):
             for i in range(len(edges)):
                 if edges[i][0] in path and edges[i][1] in path and path.index(edges[i][0]) + 1 == path.index(edges[i][1]):
                     edge_participations[i] += 1
-        edge_weights = [-9999 + new_G[shortest_path[i]][shortest_path[i+1]]["weight"] - 5 * edge_participations[i] + 0 * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
+        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] * 5 * edge_participations[i] + 0 * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
 
         removed = False
         while min(edge_weights) < 9999 and not removed:
@@ -204,10 +204,10 @@ def remove_k(G, k, n, target):
         write_output_file(G, c, k, output_path)"""
 
 if __name__ == '__main__':
-    inputs = glob.glob('inputs/small/*')
+    inputs = glob.glob('inputs/medium/*')
     count = 1
     for input_path in inputs:
-        output_path = 'outputs/small/' + basename(normpath(input_path))[:-3] + '.out'
+        output_path = 'outputs/medium/' + basename(normpath(input_path))[:-3] + '.out'
         G = read_input_file(input_path)
         """resultc, resultk, largest = None, None, 0
         for i in range(50):
