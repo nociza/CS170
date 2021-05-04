@@ -106,14 +106,14 @@ if __name__ == '__main__':
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
 if __name__ == '__main__':
-    for i in range(1):
+    for i in range(10):
         inputs = glob.glob('inputs/small/*')
         count = 1
         for input_path in inputs:
             output_path = 'outputs/small/' + basename(normpath(input_path))[:-3] + '.out'
             G = read_input_file(input_path)
             resultc, resultk, largest = None, None, 0
-            for i in range(5):
+            for i in range(10):
                 c, k = solve(G)
                 if not is_valid_solution(G, c, k):
                     continue
