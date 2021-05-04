@@ -33,7 +33,7 @@ def solve(G):
         shortest_path = nx.dijkstra_path(new_G, 0, num_nodes - 1)
         node_weights = []
         for i in range(1, len(shortest_path) - 1):
-            node_weights.append(new_G[shortest_path[i-1]][shortest_path[i]]["weight"] + new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 5 * new_G.degree[shortest_path[i]])
+            node_weights.append(new_G[shortest_path[i-1]][shortest_path[i]]["weight"] + new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 2 * new_G.degree[shortest_path[i]])
 
         removed = False
         if len(node_weights) == 0:
@@ -74,7 +74,7 @@ def solve(G):
 
     while k_max > 0:
         shortest_path = nx.dijkstra_path(new_G, 0, num_nodes - 1)
-        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 15 * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
+        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 5 * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
 
         removed = False
         while min(edge_weights) < 9999 and not removed:
