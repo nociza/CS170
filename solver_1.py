@@ -1,3 +1,5 @@
+from itertools import islice
+
 import networkx as nx
 from parse import read_input_file, write_output_file, read_output_file
 from utils import is_valid_solution, calculate_score
@@ -26,10 +28,12 @@ def solve(G):
         k_max = 100
         c_max = 5
 
-    c = []
+    c = remove_k(G, c_max, min(20, num_nodes), num_nodes - 1)
     k = []
     new_G = G.copy()
-    while c_max > 0:
+    for i in c:
+        new_G.remove_node(i)
+    """while c_max > 0:
         shortest_path = nx.dijkstra_path(new_G, 0, num_nodes - 1)
         node_weights = []
         for i in range(1, len(shortest_path) - 1):
@@ -52,7 +56,7 @@ def solve(G):
             else:
                 node_weights[min_index] = 9999
         if not removed:
-            break
+            break"""
     """print("here")
     all_paths = list(nx.all_simple_paths(new_G, 0, num_nodes - 1))
     print("here!")
@@ -74,7 +78,8 @@ def solve(G):
 
     while k_max > 0:
         shortest_path = nx.dijkstra_path(new_G, 0, num_nodes - 1)
-        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 10 * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
+
+        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 20 * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
 
         removed = False
         while min(edge_weights) < 9999 and not removed:
@@ -115,6 +120,46 @@ def solve(G):
 def edge_heuristic(G, e):
     return
 
+def k_shortest_paths(G, source, target, k, weight=None):
+    return list(islice(nx.shortest_simple_paths(G, source, target, weight=weight), k))
+
+def disconnect(G, v, target):
+    new_G = G.copy()
+    new_G.remove_node(v)
+    return not nx.has_path(new_G,0,target) or not nx.is_connected(new_G)
+
+def remove_k(G, k, n, target):
+    new_G = G.copy()
+    source = 0
+    curr_k_shortest = k_shortest_paths(new_G, source, target, n, "weight")
+    shortest = curr_k_shortest[0]
+    if k == 0 or len(shortest) == 0:
+        return []
+    else:
+        ret = []
+        for i in shortest:
+            if i == source or i == target:
+                continue
+            if disconnect(new_G, i, target):
+                continue
+            counter = 0
+            for j in curr_k_shortest:
+                if i in j:
+                    counter += 1
+                else:
+                    break
+            counter2 = 0
+            for j in curr_k_shortest:
+                if i in j:
+                    counter2 += 1
+            ret.append((i, counter, counter2))
+        if len(ret) == 0:
+            return []
+        min1 = max(ret, key=lambda x: x[1])[1]
+        ret = [a for a in ret if a[1] == min1]
+        min2 = max(ret, key=lambda x: x[2])
+        new_G.remove_node(min2[0])
+        return [min2[0]] + remove_k(new_G, k - 1, n, target)
 
 # Here's an example of how to run your solver.
 
@@ -146,10 +191,10 @@ def edge_heuristic(G, e):
         write_output_file(G, c, k, output_path)"""
 
 if __name__ == '__main__':
-    inputs = glob.glob('inputs/large/*')
+    inputs = glob.glob('inputs/small/*')
     count = 1
     for input_path in inputs:
-        output_path = 'outputs/large/' + basename(normpath(input_path))[:-3] + '.out'
+        output_path = 'outputs/small/' + basename(normpath(input_path))[:-3] + '.out'
         G = read_input_file(input_path)
         """resultc, resultk, largest = None, None, 0
         for i in range(50):
