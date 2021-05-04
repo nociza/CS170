@@ -8,7 +8,7 @@ from os.path import basename, normpath
 import glob
 
 
-def solve(G):
+def solve(G, alpha, beta):
     """
     Args:
         G: networkx.Graph
@@ -85,7 +85,7 @@ def solve(G):
             for i in range(len(edges)):
                 if edges[i][0] in path and edges[i][1] in path and path.index(edges[i][0]) + 1 == path.index(edges[i][1]):
                     edge_participations[i] += 1
-        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] * 5 * edge_participations[i] + 0 * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
+        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] * alpha * edge_participations[i] + beta * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
 
         removed = False
         while min(edge_weights) < 9999 and not removed:
@@ -218,7 +218,7 @@ if __name__ == '__main__':
             if largest < currentScore:
                 resultc, resultk = c, k
                 largest = currentScore"""
-        c, k = solve(G)
+        c, k = solve(G, 8, 8)
         currentScore = calculate_score(G, c, k)
         existingSol = read_output_file(G, output_path)
         if currentScore > existingSol:
