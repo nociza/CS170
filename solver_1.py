@@ -33,7 +33,7 @@ def solve(G):
         shortest_path = nx.dijkstra_path(new_G, 0, num_nodes - 1)
         node_weights = []
         for i in range(1, len(shortest_path) - 1):
-            node_weights.append(new_G[shortest_path[i-1]][shortest_path[i]]["weight"] + new_G[shortest_path[i]][shortest_path[i+1]]["weight"])
+            node_weights.append(new_G[shortest_path[i-1]][shortest_path[i]]["weight"] + new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 5 * new_G.degree[shortest_path[i]])
 
         removed = False
         if len(node_weights) == 0:
@@ -47,7 +47,6 @@ def solve(G):
             if nx.is_connected(H):
                 c.append(min_node)
                 new_G.remove_node(min_node)
-                print("removed", min_node)
                 c_max -= 1
                 removed = True
             else:
@@ -75,7 +74,7 @@ def solve(G):
 
     while k_max > 0:
         shortest_path = nx.dijkstra_path(new_G, 0, num_nodes - 1)
-        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 10 * new_G.degree[shortest_path[i]] + 10 * new_G.degree[shortest_path[i+1]] for i in range(len(shortest_path) - 1)]
+        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 15 * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
 
         removed = False
         while min(edge_weights) < 9999 and not removed:
@@ -111,7 +110,6 @@ def solve(G):
         if not removed:
             break"""
 
-    print(c, k)
     return c, k
 
 def edge_heuristic(G, e):
@@ -136,10 +134,10 @@ def edge_heuristic(G, e):
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
 
 """if __name__ == '__main__':
-    inputs = glob.glob('inputs/medium/*')
+    inputs = glob.glob('inputs/small/*')
     for input_path in inputs:
         print(input_path)
-        output_path = 'outputs/medium/' + basename(normpath(input_path))[:-3] + '.out'
+        output_path = 'outputs/small/' + basename(normpath(input_path))[:-3] + '.out'
         G = read_input_file(input_path)
         c, k = solve(G)
         print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
@@ -167,6 +165,6 @@ if __name__ == '__main__':
         existingSol = read_output_file(G, output_path)
         if currentScore > existingSol:
             write_output_file(G, c, k, output_path)
-            print("enhanced by: " + str(currentScore - existingSol))
+            print("enhanced by: " + str((currentScore - existingSol) / existingSol) + "%")
         print(str(count) + " out of " +str(len(inputs)) + " Done.")
         count += 1
