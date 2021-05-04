@@ -102,10 +102,10 @@ if __name__ == '__main__':
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
 if __name__ == '__main__':
     for i in range(5):
-        inputs = glob.glob('inputs/small/*')
+        inputs = glob.glob('inputs/medium/*')
         count = 1
         for input_path in inputs:
-            output_path = 'outputs/small/' + basename(normpath(input_path))[:-3] + '.out'
+            output_path = 'outputs/medium/' + basename(normpath(input_path))[:-3] + '.out'
             G = read_input_file(input_path)
             num_nodes = G.number_of_nodes()
             num_edges = G.number_of_edges()
@@ -119,7 +119,7 @@ if __name__ == '__main__':
                 MAX_EDGES_REMOVED = 100
                 MAX_NODES_REMOVED = 5
             resultc, resultk, largest = None, None, 0
-            for i in range(20):
+            for i in range(5):
                 c, k = solve(G)
                 if not is_valid_solution(G, c, k):
                     continue
