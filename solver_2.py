@@ -6,8 +6,6 @@ import sys
 from os.path import basename, normpath
 import glob
 
-MAX_EDGES_REMOVED = 15
-MAX_NODES_REMOVED = 1
 
 
 def solve(G):
@@ -110,12 +108,23 @@ if __name__ == '__main__':
 
 # For testing a folder of inputs to create a folder of outputs, you can use glob (need to import it)
 if __name__ == '__main__':
-    for i in range(10):
-        inputs = glob.glob('inputs/small/*')
+    for i in range(1):
+        inputs = glob.glob('inputs/large/*')
         count = 1
         for input_path in inputs:
-            output_path = 'outputs/small/' + basename(normpath(input_path))[:-3] + '.out'
+            output_path = 'outputs/large/' + basename(normpath(input_path))[:-3] + '.out'
             G = read_input_file(input_path)
+            num_nodes = G.number_of_nodes()
+            num_edges = G.number_of_edges()
+            if 20 <= num_nodes <= 30:
+                MAX_EDGES_REMOVED = 15
+                MAX_NODES_REMOVED = 1
+            elif 31 <= num_nodes <= 50:
+                MAX_EDGES_REMOVED = 50
+                MAX_NODES_REMOVED = 3
+            elif 51 <= num_nodes <= 100:
+                MAX_EDGES_REMOVED = 100
+                MAX_NODES_REMOVED = 5
             resultc, resultk, largest = None, None, 0
             for i in range(5):
                 c, k = solve(G)
@@ -129,7 +138,7 @@ if __name__ == '__main__':
             existingSol = read_output_file(G, output_path)
             if largest > existingSol:
                 write_output_file(G, resultc, resultk, output_path)
-                print("enhanced by: " + str(largest - existingSol))
+                print("enhanced by: " + str((largest - existingSol)/existingSol))
             print(str(count) + " out of " +str(len(inputs)) + " Done.")
             count += 1
         
