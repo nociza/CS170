@@ -6,6 +6,7 @@ from utils import is_valid_solution, calculate_score
 import sys
 from os.path import basename, normpath
 import glob
+import random
 
 
 def solve(G, alpha, beta):
@@ -85,11 +86,12 @@ def solve(G, alpha, beta):
             for i in range(len(edges)):
                 if edges[i][0] in path and edges[i][1] in path and path.index(edges[i][0]) + 1 == path.index(edges[i][1]):
                     edge_participations[i] += 1
-        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] * alpha * edge_participations[i] + beta * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
-
+        edge_weights = [(101 - new_G[shortest_path[i]][shortest_path[i+1]]["weight"]) * alpha * edge_participations[i] + beta * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
         removed = False
-        while min(edge_weights) < 9999 and not removed:
-            min_index = edge_weights.index(min(edge_weights))
+        remaining = len(edge_weights)
+        while min(edge_weights) < 9999 and not removed and remaining > 1:
+            choices = random.choices(edges, weights=edge_weights, k=1)
+            min_index = edges.index(choices[0])
             min_edge = (shortest_path[min_index], shortest_path[min_index + 1])
             H = new_G.copy()
             H.remove_edge(shortest_path[min_index], shortest_path[min_index + 1])
@@ -99,7 +101,8 @@ def solve(G, alpha, beta):
                 k_max -= 1
                 removed = True
             else:
-                edge_weights[min_index] = 9999
+                edge_weights[min_index] = 0
+                remaining -= 1
         if not removed:
             break
         """shortest_path = nx.dijkstra_path(new_G, 0, num_nodes - 1)
@@ -204,10 +207,10 @@ def remove_k(G, k, n, target):
         write_output_file(G, c, k, output_path)"""
 
 if __name__ == '__main__':
-    inputs = glob.glob('inputs/medium/*')
+    inputs = glob.glob('inputs/small/*')
     count = 1
     for input_path in inputs:
-        output_path = 'outputs/medium/' + basename(normpath(input_path))[:-3] + '.out'
+        output_path = 'outputs/small/' + basename(normpath(input_path))[:-3] + '.out'
         G = read_input_file(input_path)
         """resultc, resultk, largest = None, None, 0
         for i in range(50):
@@ -218,11 +221,12 @@ if __name__ == '__main__':
             if largest < currentScore:
                 resultc, resultk = c, k
                 largest = currentScore"""
-        c, k = solve(G, 8, 8)
-        currentScore = calculate_score(G, c, k)
-        existingSol = read_output_file(G, output_path)
-        if currentScore > existingSol:
-            write_output_file(G, c, k, output_path)
-            print("enhanced by: " + str((currentScore - existingSol) / existingSol) + "%")
-        print(str(count) + " out of " +str(len(inputs)) + " Done.")
+        for i in range(100):
+            c, k = solve(G, 10, 0)
+            currentScore = calculate_score(G, c, k)
+            existingSol = read_output_file(G, output_path)
+            if currentScore > existingSol:
+                write_output_file(G, c, k, output_path)
+                print("enhanced by: " + str((currentScore - existingSol) / existingSol) + "%")
+            print(str(count) + " out of " +str(len(inputs)) + " Done.")
         count += 1
