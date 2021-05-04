@@ -34,25 +34,19 @@ def simulatedAnnealing(initialTreshold, G):
             return
         largestYet, diff = None, 0 
         allnodes = nx.dijkstra_path(G, 0, endNode)
-        random.shuffle(allnodes)
+        improvementScore = []
+        noPossibleUpdates = True
         for i in allnodes:
-            if i == 0 or i == endNode:
-                continue
-            currentDiff = node_diff(G, i, endNode)
-            if currentDiff and random.random() > threshold:
-                if random.random() > 0.5 and deletedNodes:
-                    deletedNodes.remove(random.choice(deletedNodes))
-                    return nodeRemover(threshold - 0.001, nodesRemoved - 1)
-                else:
-                    largestYet = i
-                break
-            elif currentDiff and currentDiff > diff:
-                largestYet = i
-                diff = currentDiff
-        if largestYet:
-            deletedNodes.append(largestYet)
-            G.remove_node(largestYet)
-            return nodeRemover(threshold + 0.001, nodesRemoved + 1)
+            score = node_diff(G, i, endNode)
+            if score:
+                noPossibleUpdates = False
+                improvementScore.append(score if score else 0)
+        if noPossibleUpdates:
+            return 
+        chosenNode = random.choices(allnodes, weights=improvementScore, k = 1)
+        deletedNodes.append(chosenNode[0])
+        G.remove_node(chosenNode[0][0],chosenNode[0][1])
+        return nodeRemover(threshold + 0.001, nodesRemoved + 1)
     
     def edgeRemover(threshold, edgesRemoved):
         if edgesRemoved >= MAX_EDGES_REMOVED or threshold >= 1:
