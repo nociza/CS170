@@ -78,8 +78,14 @@ def solve(G):
 
     while k_max > 0:
         shortest_path = nx.dijkstra_path(new_G, 0, num_nodes - 1)
-
-        edge_weights = [new_G[shortest_path[i]][shortest_path[i+1]]["weight"] + 20 * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
+        shortest_paths = k_shortest_paths(new_G, 0, num_nodes - 1, 20)
+        edges = edges_in_path(shortest_path)
+        edge_participations = [0 for e in edges]
+        for path in shortest_paths:
+            for i in range(len(edges)):
+                if edges[i][0] in path and edges[i][1] in path and path.index(edges[i][0]) + 1 == path.index(edges[i][1]):
+                    edge_participations[i] += 1
+        edge_weights = [-9999 + new_G[shortest_path[i]][shortest_path[i+1]]["weight"] - 5 * edge_participations[i] + 0 * (new_G.degree[shortest_path[i]] + new_G.degree[shortest_path[i+1]]) for i in range(len(shortest_path) - 1)]
 
         removed = False
         while min(edge_weights) < 9999 and not removed:
@@ -116,6 +122,13 @@ def solve(G):
             break"""
 
     return c, k
+
+
+def edges_in_path(shortest_path):
+    edges = []
+    for i in range(len(shortest_path) - 1):
+        edges.append((shortest_path[i], shortest_path[i + 1]))
+    return edges
 
 def edge_heuristic(G, e):
     return
